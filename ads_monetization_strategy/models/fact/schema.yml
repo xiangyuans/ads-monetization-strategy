@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: fact_daily_consumer_ads_spend
+    description: >
+      Fact table of daily ad spend, one row per
+      date / ad product category / region / placement / industry / customer / account.
+      Built directly from int_daily_consumer_ads_spend; join to dim_date on date.
+
+      Assumptions:
+      - ads_spend is the advertiser spend for the row: impressions * cpm / 1000, rounded to 1 decimal.
+      - Rows with 0 impressions are kept so that days with no delivery remain visible.
+    columns:
+      - name: ads_cpm_id
+        description: "Surrogate key: MD5 hash of the row's grain columns."
+        data_tests:
+          - unique
+          - not_null
+      - name: date
+        description: "Delivery date; foreign key to dim_date."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date
+      - name: ad_product_category
+        description: "Ad product category (A-C)."
+      - name: region
+        description: "Region (One-Fourteen)."
+      - name: ad_placement
+        description: "Ad placement (Alpha-Zeta)."
+      - name: industry
+        description: "Advertiser industry code (A-X)."
+      - name: customer_id
+        description: "Customer identifier as string. Corrupted values are kept as-is; see is_customer_id_corrupted."
+      - name: is_customer_id_corrupted
+        description: "True when customer_id was mangled into scientific notation."
+      - name: account_id
+        description: "Account identifier; null where the source had 'NULL'."
+      - name: impressions
+        description: "Number of ad impressions served."
+        data_tests:
+          - not_null
+      - name: cpm
+        description: "Cost per thousand impressions."
+        data_tests:
+          - not_null
+      - name: ads_spend
+        description: "Advertiser spend: impressions * cpm / 1000, rounded to 1 decimal."
+        data_tests:
+          - not_null
+      - name: has_impressions
+        description: "True when the row served at least one impression."
+        data_tests:
+          - not_null

@@ -1,0 +1,65 @@
+version: 2
+
+seeds:
+  - name: tiktok_monetization_strategy
+    description: >
+      Raw daily ad delivery data (2018-08-19 to 2019-05-03), one row per
+      date / ad product category / region / placement / industry / customer / account.
+      All columns are loaded as strings; see stg_daily_consumer_ads_cpm for typed values.
+    columns:
+      - name: date
+        description: "Delivery date in M/D/YYYY format."
+        data_tests:
+          - not_null
+
+      - name: ad_product_category
+        description: "Ad product category (A-C)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['A', 'B', 'C']
+
+      - name: region
+        description: "Region, spelled out as a number word (One-Fourteen)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
+                         'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen']
+
+      - name: ad_placement
+        description: "Ad placement (Alpha-Zeta)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta']
+
+      - name: industry
+        description: "Advertiser industry code (A-X)."
+        data_tests:
+          - not_null
+
+      - name: impressions
+        description: "Number of ad impressions served."
+        data_tests:
+          - not_null
+
+      - name: cpm
+        description: "Cost per thousand impressions."
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: >
+          Customer identifier (up to 20 digits, so kept as string). Some values are
+          corrupted scientific notation (e.g. '.62986E+151.62986E+1').
+        data_tests:
+          - not_null
+
+      - name: account_id
+        description: "Account identifier. Missing values appear as the literal string 'NULL'."
+        data_tests:
+          - not_null

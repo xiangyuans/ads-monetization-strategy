@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg_daily_consumer_ads_cpm
+    description: >
+      Typed and cleaned version of the tiktok_monetization_strategy seed, one row per
+      date / ad product category / region / placement / industry / customer / account.
+
+      Assumptions:
+      - Initial data cleaning: cpm values of '#DIV/0!' were replaced with 0 in the seed file.
+      - ads_cpm_id is a hash of date, ad_product_category, region, ad_placement, industry,
+        customer_id and account_id, which together uniquely identify a row.
+    columns:
+      - name: ads_cpm_id
+        description: >
+          Surrogate key: MD5 hash of date, ad_product_category, region, ad_placement,
+          industry, customer_id and account_id.
+        data_tests:
+          - unique
+          - not_null
+      - name: date
+        description: "Delivery date."
+        data_tests:
+          - not_null
+      - name: ad_product_category
+        description: "Ad product category (A-C)."
+        data_tests:
+          - not_null
+      - name: region
+        description: "Region (One-Fourteen)."
+        data_tests:
+          - not_null
+      - name: ad_placement
+        description: "Ad placement (Alpha-Zeta)."
+        data_tests:
+          - not_null
+      - name: industry
+        description: "Advertiser industry code (A-X)."
+        data_tests:
+          - not_null
+      - name: impressions
+        description: "Number of ad impressions served."
+        data_tests:
+          - not_null
+      - name: cpm
+        description: "Cost per thousand impressions."
+        data_tests:
+          - not_null
+      - name: customer_id
+        description: "Customer identifier as string. Corrupted values are kept as-is; see is_customer_id_corrupted."
+        data_tests:
+          - not_null
+      - name: is_customer_id_corrupted
+        description: >
+          True when customer_id was mangled into scientific notation (e.g. '.62986E+151.62986E+1').
+          The original digits are lost, and one corrupted value may represent several real customers.
+        data_tests:
+          - not_null
+      - name: account_id
+        description: "Account identifier; null where the source had 'NULL'."
